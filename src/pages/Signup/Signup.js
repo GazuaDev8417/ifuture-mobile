@@ -1,6 +1,6 @@
 import { useContext, useState } from "react"
 import axios from 'axios'
-import { View, Text, TextInput, TouchableOpacity, StyleSheet } from "react-native"
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView } from "react-native"
 import { url } from "../../constants/urls"
 import { AuthContext } from "../../global/Context"
 
@@ -48,46 +48,48 @@ const Signup = (props)=>{
     
     return(
         <View style={styles.container}>
-            <View style={styles.form}>
-                <TextInput style={styles.input}
-                    value={nome}
-                    onChangeText={setNome}
-                    placeholder='Nome completo'/>
+           <ScrollView> 
+                <View style={styles.form}>
+                    <TextInput style={styles.input}
+                        value={nome}
+                        onChangeText={setNome}
+                        placeholder='Nome completo'/>
 
-                <TextInput style={styles.input}
-                    value={email}
-                    onChangeText={setEmail}
-                    placeholder='nome@gmail.com'/>
-                
-                <TextInput style={styles.input}
-                    value={cpf}
-                    onChangeText={setCpf}
-                    keyboardType='numeric'
-                    placeholder='CPF'/>
-                
-                <TextInput style={styles.input}
-                    value={senha}
-                    onChangeText={setSenha}
-                    secureTextEntry={true}
-                    placeholder='Senha'/>
+                    <TextInput style={styles.input}
+                        value={email}
+                        onChangeText={setEmail}
+                        placeholder='nome@gmail.com'/>
+                    
+                    <TextInput style={styles.input}
+                        value={cpf}
+                        onChangeText={setCpf}
+                        keyboardType='numeric'
+                        placeholder='CPF'/>
+                    
+                    <TextInput style={styles.input}
+                        value={senha}
+                        onChangeText={setSenha}
+                        secureTextEntry={true}
+                        placeholder='Senha'/>
 
-                <TextInput style={styles.input}
-                    value={confSenha}
-                    onChangeText={setConfSenha}
-                    secureTextEntry={true}
-                    placeholder='Confirme sua senha'/>
+                    <TextInput style={styles.input}
+                        value={confSenha}
+                        onChangeText={setConfSenha}
+                        secureTextEntry={true}
+                        placeholder='Confirme sua senha'/>
 
-                <View style={styles.btnContainer}>
-                    <TouchableOpacity onPress={limpar}
-                        style={styles.button}>
-                        <Text style={{color:'whitesmoke'}}>Limpar</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity onPress={signup}
-                        style={styles.button}>
-                        <Text style={{color:'whitesmoke'}}>Registrar</Text>
-                    </TouchableOpacity>                        
+                    <View style={styles.btnContainer}>
+                        <TouchableOpacity onPress={limpar}
+                            style={styles.button}>
+                            <Text style={{color:'whitesmoke'}}>Limpar</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity onPress={signup}
+                            style={styles.button}>
+                            <Text style={{color:'whitesmoke'}}>Registrar</Text>
+                        </TouchableOpacity>                        
+                    </View>
                 </View>
-            </View>
+            </ScrollView>
         </View>
     )
 }
@@ -99,7 +101,7 @@ const styles = StyleSheet.create({
       alignItems: 'center',  
     },
     form: {
-      marginTop: 100 
+      marginTop: 30
     },
     input: {
         backgroundColor: 'lightgray',
@@ -114,7 +116,7 @@ const styles = StyleSheet.create({
         display: 'flex',
         flexDirection: 'row',
         justifyContent: 'space-between',
-        marginTop: 25
+        margin: 10
     },
     button: {
         backgroundColor: '#e8222e',

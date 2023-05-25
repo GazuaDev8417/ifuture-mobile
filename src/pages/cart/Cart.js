@@ -6,7 +6,7 @@ import { Avatar } from 'react-native-paper'
 import Edit from 'react-native-vector-icons/Entypo'
 import { Picker } from "@react-native-picker/picker"
 import AsyncStorage from '@react-native-async-storage/async-storage'
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-native'
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Image } from 'react-native'
 
 
 
@@ -31,7 +31,7 @@ const Cart = (props)=>{
         for(let value of bag){
             sum += value.price * states.product
         }
-        return sum
+        return sum.toFixed(2)
     }
 
 
@@ -96,13 +96,19 @@ const Cart = (props)=>{
             {bag.length > 0 ? bag.map(b=>{
                 return(
                     <View key={b.id} style={styles.container}>
-                        <Avatar.Image size={60}
+                        <Image
                             style={styles.img}
                             source={{uri: b.photoUrl}}/>
                         <View style={styles.section}>
-                            <Text>{b.name}</Text>
-                            <Text>{b.description}</Text>
-                            <Text>R$ {b.price},00</Text>
+                            <Text style={{textAlign:'center',fontSize:18}}>
+                                {b.name}
+                            </Text>
+                            <Text style={{textAlign:'left'}}>
+                                {b.description}
+                            </Text>
+                            <Text style={{textAlign:'left'}}>
+                                R$ {b.price.toFixed(2)}
+                            </Text>
                         </View>
                         <TouchableOpacity style={styles.button}
                             onPress={()=> removeFromCart(b)}>
@@ -150,24 +156,31 @@ const styles = StyleSheet.create({
         fontSize: 20,
     },
     container: {
+        borderWidth: 1,
+        padding: 5,
+        borderRadius: 10,
         display: 'flex',
-        flexDirection: 'row',
+        flexDirection: 'column',
         alignItems: 'center',
         margin: 15,
         justifyContent: 'space-between'
     },
     section: {
-
+        width: '100%',
     },
     button: {
         backgroundColor: 'red',
+        width: '100%',
         padding: 5,
         borderRadius: 10,
-        width: 80,
+        margin: 10,
         alignItems: 'center'
     },
     img: {
-        backgroundColor: 'white'
+        backgroundColor: 'white',
+        width: '100%',
+        height: 100,
+        borderRadius: 10
     },
     totalStyle: {
         fontSize: 18,
@@ -175,6 +188,7 @@ const styles = StyleSheet.create({
     },
     btnShop: {
         backgroundColor: 'red',
+        borderRadius: 10,
         padding: 5,
         margin: 5
     }

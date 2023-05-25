@@ -2,7 +2,7 @@ import { useContext } from "react"
 import { AuthContext } from "../../global/Context"
 import { Avatar } from "react-native-paper"
 import Popup from "../../components/Modal"
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native'
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image } from 'react-native'
 
 
 
@@ -26,7 +26,7 @@ const Detail = ()=>{
                 <Text>{restaurant.description}</Text>
                 <View style={styles.details}>
                     <Text>{restaurant.deliveryTime} - {restaurant.deliveryTime + 10} min</Text>
-                    <Text>Frete R$ {restaurant.shipping},00</Text>
+                    <Text>Frete R$ {restaurant.shipping.toFixed(2)}</Text>
                 </View>
                 <Text style={{marginTop:10}}>{restaurant.address}</Text>
                 <Text style={{marginTop: 20, textAlign:'center'}}>Cardápio principal</Text>
@@ -36,11 +36,12 @@ const Detail = ()=>{
             {pratos && pratos.map(prato=>{
                 return(
                     <View key={prato.id} style={styles.card}>
-                        <Avatar.Image style={styles.img} 
+                        <Image                            
+                            style={styles.img} 
                             source={{uri: prato.photoUrl}}/>
-                        <View>
+                        <View style={styles.legendCard}>
                             <Text style={{color:'red', marginLeft:5}}>{prato.name}</Text>
-                            <Text style={{marginLeft:5}}>R$ {prato.price},00</Text>
+                            <Text style={{marginLeft:5}}>R$ {prato.price.toFixed(2)}</Text>
                         </View>
                         <TouchableOpacity style={styles.button}
                             onPress={()=> setters.add(prato)}>
@@ -77,7 +78,7 @@ const styles = StyleSheet.create({
     },
     card: {
         display: 'flex',
-        flexDirection: 'row',
+        flexDirection: 'column',
         alignItems: 'center',
         justifyContent: 'space-between',
         margin: 10,
@@ -85,11 +86,22 @@ const styles = StyleSheet.create({
         padding: 5,
         borderRadius: 10
     },
+    legendCard: {
+        marginTop: 10,
+        width: '80%',
+        flexDirection:'row',
+        justifyContent:'space-between'
+    },
     img: {
-        backgroundColor: 'white'
+        backgroundColor: 'white',
+        width: '100%',
+        height: 100,
+        borderRadius: 10
     },
     button: {
         margin: 10,
+        width: '90%',
+        alignItems: 'center',
         backgroundColor: 'red',
         padding: 5,
         borderRadius: 10,

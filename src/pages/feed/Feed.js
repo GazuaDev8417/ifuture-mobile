@@ -88,7 +88,7 @@ const Feed =(props)=>{
 
     return(
         <View>
-            <Searchbar style={{margin:10}} onChangeText={onChangeSearch} value={searchQuery}/>
+            <Searchbar style={styles.searchBarStyle} onChangeText={onChangeSearch} value={searchQuery}/>
             <ScrollView
                 refreshControl={
                     <RefreshControl
@@ -107,7 +107,7 @@ const Feed =(props)=>{
                                 <Text style={styles.restName}>{rest.name}</Text>
                                 <Text style={styles.content}>
                                     Entrega em: {rest.deliveryTime}min{'\n'}
-                                    Frete: R$ {rest.shipping},00
+                                    Frete: R$ {rest.shipping.toFixed(2)}
                                 </Text>
                             </View>
                         )
@@ -120,14 +120,19 @@ const Feed =(props)=>{
 
 
 const styles = StyleSheet.create({
+    searchBarStyle: {
+        margin: 10
+    },
     logo: {
         alignItems: 'center'
     },
     container: {
+        display: 'flex',
+        flexDirection: 'column',
         borderWidth: 1,
         borderColor: 'red',
         padding: 10,
-        margin: 10
+        margin: 10,
     },
     avatar: {
         margin: 10

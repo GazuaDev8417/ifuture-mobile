@@ -88,7 +88,7 @@ const styles = StyleSheet.create({
     },
     pickerContainer: {
         width: 80,
-        backgroundColor: 'lightgray',
+        backgroundColor: 'white',
     },
     pickerContent: {
         width: 10,        

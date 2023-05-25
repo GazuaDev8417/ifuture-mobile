@@ -7,15 +7,16 @@ import { Text,
     TextInput,
     View,
     TouchableOpacity,
-    BackHandler
+    BackHandler,
+    ScrollView
 } from "react-native"
 import AsyncStorage from "@react-native-async-storage/async-storage"
 
 
 
 const Login = (props)=>{
-    const [email, setEmail] = useState('')
-    const [password, setPassword] = useState('')
+    const [email, setEmail] = useState('astrodev@future4.com')
+    const [password, setPassword] = useState('123456')
     const { setters } = useContext(AuthContext)
 
 
@@ -58,34 +59,36 @@ const Login = (props)=>{
 
     return(
         <View style={styles.container}>
-            <View style={styles.form}>
-                <TextInput style={styles.input}
-                    value={email}
-                    onChangeText={setEmail}
-                    placeholder="nome@email.com"/>
-                
-                <TextInput style={styles.input}
-                    value={password}
-                    onChangeText={setPassword}
-                    secureTextEntry={true}
-                    placeholder="Senha"/>
+            <ScrollView>
+                <View style={styles.form}>
+                    <TextInput style={styles.input}
+                        value={email}
+                        onChangeText={setEmail}
+                        placeholder="nome@email.com"/>
+                    
+                    <TextInput style={styles.input}
+                        value={password}
+                        onChangeText={setPassword}
+                        secureTextEntry={true}
+                        placeholder="Senha"/>
 
-                <View style={styles.btnContainer}>
-                    <TouchableOpacity onPress={limpar}
-                        style={styles.button}>
-                        <Text style={{color:'whitesmoke'}}>Limpar</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity onPress={login}
-                        style={styles.button}>
-                        <Text style={{color:'whitesmoke'}}>Entrar</Text>
-                    </TouchableOpacity>
-                </View>
-                <Text style={styles.linkContainer}>
-                    Ainda não tem cadastro?
-                    <Text style={styles.link}
-                        onPress={()=> props.navigation.navigate('Signup')}> Clique aqui.</Text>                
-                </Text>
-            </View>            
+                    <View style={styles.btnContainer}>
+                        <TouchableOpacity onPress={limpar}
+                            style={styles.button}>
+                            <Text style={{color:'whitesmoke'}}>Limpar</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity onPress={login}
+                            style={styles.button}>
+                            <Text style={{color:'whitesmoke'}}>Entrar</Text>
+                        </TouchableOpacity>
+                    </View>
+                    <Text style={styles.linkContainer}>
+                        Ainda não tem cadastro?
+                        <Text style={styles.link}
+                            onPress={()=> props.navigation.navigate('Signup')}> Clique aqui.</Text>                
+                    </Text>
+                </View> 
+            </ScrollView>           
         </View>
     )
 }
@@ -109,9 +112,9 @@ const styles = StyleSheet.create({
         paddingHorizontal: 10
     },
     btnContainer: {
-        marginTop: 25,
+        margin: 10,
         flexDirection: 'row',
-        justifyContent: 'space-around', 
+        justifyContent: 'space-between', 
         alignItems: 'center',
     },
     button: {
@@ -123,7 +126,7 @@ const styles = StyleSheet.create({
     },
     linkContainer: {
         alignItems: 'center',
-        marginTop: 50,
+        marginTop: 30,
         textAlign: 'center'
     },
     link: {

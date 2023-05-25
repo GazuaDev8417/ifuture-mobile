@@ -3,7 +3,7 @@ import { AuthContext } from '../../global/Context'
 import axios from 'axios'
 import { url } from '../../constants/urls'
 import AsyncStorage from '@react-native-async-storage/async-storage'
-import { View, Text, TextInput, StyleSheet, TouchableOpacity } from 'react-native'
+import { View, Text, TextInput, StyleSheet, TouchableOpacity, ScrollView } from 'react-native'
 
 
 const UpdateProfile = (props)=>{
@@ -44,31 +44,33 @@ const UpdateProfile = (props)=>{
 
     return(
         <View style={styles.container}>
-            <View style={styles.form}>
-                <TextInput style={styles.input}
-                    onChangeText={setName}
-                    value={name}
-                    placeholder='Nome'/>
-                <TextInput style={styles.input}
-                    onChangeText={setEmail}
-                    value={email}
-                    placeholder='nome@email.com'/>
-                <TextInput style={styles.input}
-                    onChangeText={setCpf}
-                    value={cpf}
-                    placeholder='CPF'
-                    keyboardType='numeric'/>
-                <View style={styles.btnContainer}>
-                    <TouchableOpacity style={styles.button}
-                        onPress={cleanUp}>
-                        <Text style={{color:'whitesmoke'}}>Limpar</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity style={styles.button}
-                        onPress={upToDate}>
-                        <Text style={{color:'whitesmoke'}}>Salvar</Text>
-                    </TouchableOpacity>                    
+            <ScrollView>
+                <View style={styles.form}>
+                    <TextInput style={styles.input}
+                        onChangeText={setName}
+                        value={name}
+                        placeholder='Nome'/>
+                    <TextInput style={styles.input}
+                        onChangeText={setEmail}
+                        value={email}
+                        placeholder='nome@email.com'/>
+                    <TextInput style={styles.input}
+                        onChangeText={setCpf}
+                        value={cpf}
+                        placeholder='CPF'
+                        keyboardType='numeric'/>
+                    <View style={styles.btnContainer}>
+                        <TouchableOpacity style={styles.button}
+                            onPress={cleanUp}>
+                            <Text style={{color:'whitesmoke'}}>Limpar</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity style={styles.button}
+                            onPress={upToDate}>
+                            <Text style={{color:'whitesmoke'}}>Salvar</Text>
+                        </TouchableOpacity>                    
+                    </View>
                 </View>
-            </View>
+            </ScrollView>
         </View>
     )
 }
@@ -80,7 +82,7 @@ const styles = StyleSheet.create({
         alignItems: 'center'
     },
     form: {
-        marginTop: 100
+        marginTop: 50
     },
     input: {
         backgroundColor: 'lightgray',
@@ -92,7 +94,7 @@ const styles = StyleSheet.create({
         paddingHorizontal: 10
     },
     btnContainer: {
-        marginTop: 25,
+        margin: 10,
         display: 'flex',
         flexDirection: 'row',
         justifyContent: 'space-between'
