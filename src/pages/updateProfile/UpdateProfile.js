@@ -56,6 +56,7 @@ const UpdateProfile = (props)=>{
                         placeholder='nome@email.com'/>
                     <TextInput style={styles.input}
                         onChangeText={setCpf}
+                        maxLength={11}
                         value={cpf}
                         placeholder='CPF'
                         keyboardType='numeric'/>

@@ -63,6 +63,7 @@ const Signup = (props)=>{
                     <TextInput style={styles.input}
                         value={cpf}
                         onChangeText={setCpf}
+                        maxLength={11}
                         keyboardType='numeric'
                         placeholder='CPF'/>
                     
