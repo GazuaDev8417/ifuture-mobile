@@ -21,7 +21,7 @@
         "resourceClass": "m1-medium"
       },
       "android": {
-        "buildType": "apk"
+        "buildType": "app-bundle"
       }
     }
   },

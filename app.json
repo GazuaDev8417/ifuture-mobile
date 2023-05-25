@@ -2,7 +2,7 @@
   "expo": {
     "name": "ifuture",
     "slug": "ifuture",
-    "version": "1.0.6",
+    "version": "1.0.8",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
@@ -22,7 +22,7 @@
         "foregroundImage": "./assets/icon.png",
         "backgroundColor": "#ffffff"
       },
-      "versionCode": 7,
+      "versionCode": 9,
       "permissions": [],
       "package": "com.gazua300.ifuture"
     },
