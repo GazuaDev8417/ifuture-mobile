@@ -89,8 +89,8 @@ const styles = StyleSheet.create({
     legendCard: {
         marginTop: 10,
         width: '80%',
-        flexDirection:'row',
-        justifyContent:'space-between'
+        flexDirection:'column',
+        alignItems:'center'
     },
     img: {
         backgroundColor: 'white',

@@ -17,16 +17,12 @@ const Popup = ()=>{
                 animationType="slide"
                 visible={states.visible}
                 transparent={true}>
-
-
-                <TouchableOpacity onPress={()=> setters.setVisible(false)}
-                    style={styles.close}>
-                    <Icon name='close' size={35}/>
-                </TouchableOpacity>
                 <View style={styles.modalContainer}>
                     <Text style={styles.txtStyle}>
-                        {states.dish.name}{'\n'}
-                        Informe a quantidade desejada
+                        {states.dish.name}{'\n'}                        
+                    </Text>
+                    <Text style={{fontSize:13, textAlign:'center', color:'whitesmoke'}}>
+                            Informe a quantidade desejada
                     </Text>                
                     <View style={styles.modalStyle}>
                         <Picker style={styles.pickerContainer}
@@ -54,10 +50,16 @@ const Popup = ()=>{
                             <Picker.Item style={styles.pickerContent}
                                 label="10" value={10}/>
                         </Picker>
-                        <TouchableOpacity style={styles.button}>
-                            <Text style={{color:'whitesmoke'}}
-                                onPress={()=> setters.addToCart(states.dish)}>Carrinho</Text>
-                        </TouchableOpacity>
+                        <View style={{flexDirection:'row'}}>
+                            <TouchableOpacity style={styles.button}>
+                                <Text style={{color:'whitesmoke'}}
+                                    onPress={()=> setters.setVisible(false)}>Cancelar</Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity style={styles.button}
+                                onPress={()=> setters.addToCart(states.dish)}>
+                                <Icon name="cart-plus" size={20} color='whitesmoke'/>
+                            </TouchableOpacity>
+                        </View>
                     </View>
                 </View>                
             </Modal>
@@ -77,7 +79,8 @@ const styles = StyleSheet.create({
     txtStyle: {
         color: 'whitesmoke',
         fontSize: 20,
-        textAlign: 'center'
+        textAlign: 'center',
+        marginBottom: -20
     },
     modalStyle: {
         margin: 20,
@@ -94,11 +97,11 @@ const styles = StyleSheet.create({
         width: 10,        
     },
     button: {
-        margin: 10,
+        margin: 5,
+        alignItems: 'center',
         backgroundColor: 'red',
-        padding: 5,
-        borderRadius: 10,
-        width: 100,
+        borderRadius: 5,
+        padding: 10,
         alignItems: 'center'
     },
     close: {
