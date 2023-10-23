@@ -1,6 +1,6 @@
-# labefood_mobile
+# Ifuture_mobile
 
-Aplicativo móvel para serviços de restaurantes. O usuário pode se cadastrar no serviço para ter uma conta, que quando logado tem acesso a lista de restaurantes de seus cardápios.<br>
+Aplicativo móvel para serviços de restaurantes. O usuário pode se cadastrar no serviço para ter uma conta, quando logado tem acesso a lista de restaurantes e seus cardápios.<br>
 <li>Lista de restaurantes<br>
 Cliquando em qualquer dos restaurantes você será redirecionado à página dos detalhes do mesmo, onde poderá ver a descrição, endereço, valor do frete e o cardápio oferecido.</li><br>
 <img src='./imgREADME/feed.jpeg' width='300'><br><br>
@@ -16,5 +16,6 @@ Cliquando no botão adicionar um modal para escolher a quantidade do produto ref
 </li><br>
 
 > Obs.: Há também as páginas de login, cadastramento de usuário, cadastramento de endereço e perfil, que não foram colocadas em pauta por serem autodedutivas.
+> A aplicação se trata de uma simulação do serviço, evidentemente toda a conexão com os restaurantes e seus serviços é fictícia, tratando-se então de uma simples demonstração de skills na área de programação react native
 
 >https://play.google.com/store/apps/details?id=com.gazua300.ifuture
