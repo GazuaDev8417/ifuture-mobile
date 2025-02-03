@@ -6,7 +6,7 @@ import { Avatar } from 'react-native-paper'
 import Edit from 'react-native-vector-icons/Entypo'
 import { Picker } from "@react-native-picker/picker"
 import AsyncStorage from '@react-native-async-storage/async-storage'
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Image } from 'react-native'
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Image, TextInput } from 'react-native'
 
 
 
@@ -16,63 +16,43 @@ const Cart = (props)=>{
     const bag = states.bag
     const profile = states.profile
     const restaurant = states.restaurant
-    const request = states.request
     const [value, setValue] = useState('money')
+    const [total, setTotal] = useState(0)
 
 
 
     useEffect(()=>{
         requests.getProfile()
+        requests.getAllOrders()
+        setTotal(bag.reduce((acc, item) => acc + item.total, 0))
     }, [])
 
 
-    const total = ()=>{
-        let sum = 0
-        for(let value of bag){
-            sum += value.price * states.product
-        }
-        return sum.toFixed(2)
-    }
 
+    const handleNumber = async(e, id)=>{
+        const newQuantity = Number(e)
+        const updatedBag = bag.map(item => {
+            if(item.id === id){
+                return { ...item, quantity: newQuantity }
+            }
 
-    const removeFromCart = (item)=>{
-        const newBag = bag.filter(b=>{
-            return b.id !== item.id
+            return item 
         })
-        setters.setBag(newBag)
+        const headers = {
+            headers: { authorization: await AsyncStorage.getItem('token') }
+        }
+        
+        axios.patch(`${url}/order/${id}`, {
+            quantity: newQuantity
+        }, headers).then(()=>{
+            getAllOrders()
+        }).catch(e => alert(e.response.data) )
+
+        setTotal(updatedBag.reduce((acc, item) => acc + item.total, 0))
     }
 
 
     const shopFinish = async()=>{
-        const body = {
-            products: [
-                {
-                    id: states.dishId,
-                    quantity: states.product
-                }
-            ],
-            paymentMethod: value
-        }
-        const headers = {
-            headers: {
-                auth: await AsyncStorage.getItem('token')
-            }
-        }
-
-        axios.post(`${url}/restaurants/${states.restaurantId}/order`, body, headers).then(res=>{
-            alert('Compra realizada com sucesso')
-        }).catch(e=>{
-            alert(e.response.data.message)
-        })
-    }
-
-
-    const checkActiveRequest = ()=>{
-        if(Object.keys(request).length === 0){
-            alert('Não há pedidos no momento')
-        }else{
-            alert(`${request.restaurantName}\n\nData do pedido: ${new Date(request.createdAt).toLocaleString()}\nExpiração: ${new Date(request.expiresAt).toLocaleString()}\nTotal: R$ ${request.totalPrice}`)
-        }
     }
 
 
@@ -82,32 +62,37 @@ const Cart = (props)=>{
             <View style={styles.sectionOne}>
                 <View>
                     <Text style={{fontSize:17}}>Endereço para entrega:</Text>
-                    <Text style={{marginTop:5}}>{profile.address}</Text>
+                    <Text style={{marginTop:5}}>
+                        {profile.street} {profile.number}, {profile.neighbourhood}{'\n'}
+                        {profile.city} - {profile.state}
+                    </Text>
                 </View>
                 <TouchableOpacity onPress={()=> props.navigation.navigate('Endereço')}>
                     <Edit name='edit' size={18}/>
                 </TouchableOpacity>
             </View>
-            <View style={{margin:15}}>
-                <Text style={styles.restStyle}>{restaurant.name}</Text>
-                <Text style={{marginTop:10}}>{restaurant.address}</Text>
-            </View>
             <View style={{borderWidth:1, marginBottom:30, margin:10}}/>
             {bag.length > 0 ? bag.map(b=>{
                 return(
                     <View key={b.id} style={styles.container}>
+                        <Text style={{textAlign:'center',fontSize:18, color:'red'}}>
+                            {b.product} R$ {b.price.toFixed(2)}
+                        </Text>
                         <Image
                             style={styles.img}
                             source={{uri: b.photoUrl}}/>
                         <View style={styles.section}>
-                            <Text style={{textAlign:'center',fontSize:18}}>
-                                {b.name}
-                            </Text>
+                            <View style={styles.quantitySection}>
+                                <Text>Quantidade:</Text>
+                                <TextInput
+                                    style={styles.quantity}
+                                    keyboardType='numeric'
+                                    value={b.quantity}
+                                    onChangeText={(e) => handleNumber(e, b.id)}
+                                    />
+                            </View>
                             <Text style={{textAlign:'left'}}>
-                                {b.description}
-                            </Text>
-                            <Text style={{textAlign:'left'}}>
-                                R$ {b.price.toFixed(2)}
+                                Total: R$ {((b.price) * (b.quantity)).toFixed(2)}
                             </Text>
                         </View>
                         <TouchableOpacity style={styles.button}
@@ -119,7 +104,7 @@ const Cart = (props)=>{
             }) : <Text style={{textAlign:'center', 
                     fontSize:20}}>Seu carrinho está vázio</Text>}
             <Text style={styles.totalStyle}>
-                Total: R$ {total()}
+                Total: R$ {total.toFixed(2)}
             </Text>
             <View style={{borderWidth:1, margin:10}}/>
             <Picker style={{width:200, marginLeft:5}}
@@ -132,10 +117,6 @@ const Cart = (props)=>{
             <TouchableOpacity style={styles.btnShop}
                 onPress={shopFinish}>
                 <Text style={{textAlign:'center', color:'whitesmoke'}}>Finalizar compra</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.btnShop}
-                onPress={checkActiveRequest}>
-                <Text style={{textAlign:'center', color:'whitesmoke'}}>Constultar pedido ativo</Text>
             </TouchableOpacity>
         </ScrollView>
     )
@@ -167,6 +148,20 @@ const styles = StyleSheet.create({
     },
     section: {
         width: '100%',
+        display: 'flex'
+    },
+    quantitySection: {
+        width:'100%',
+        flexDirection:'row',
+        justifyContent: 'space-between',
+        alignItems: 'center'
+    },
+    quantity: {
+        borderWidth: .5,
+        borderColor: 'gray',
+        borderRadius: 10,
+        paddingLeft: 10,
+        width: 40
     },
     button: {
         backgroundColor: 'red',
@@ -180,7 +175,8 @@ const styles = StyleSheet.create({
         backgroundColor: 'white',
         width: '100%',
         height: 100,
-        borderRadius: 10
+        borderRadius: 10,
+        marginVertical: 10
     },
     totalStyle: {
         fontSize: 18,

@@ -1,5 +1,4 @@
 import { createContext, useEffect, useState } from "react"
-import { useNavigation } from "@react-navigation/native"
 import AsyncStorage from "@react-native-async-storage/async-storage"
 import { url } from "../constants/urls"
 import axios from 'axios'
@@ -9,20 +8,20 @@ export const AuthContext = createContext()
 
 
 function AuthProvider(props){
-    const [restaurant, setRestaurant] = useState([])
+    const [restaurant, setRestaurant] = useState({})
     const [restaurantId, setRestaurantId] = useState('')
     const [product, setProduct] = useState(1)
+    const [products, setProducts] = useState([])
+    const [bag, setBag] = useState([])
     const [dish, setDish] = useState({})
     const [dishId, setDishId] = useState('')
     const [visible, setVisible] = useState(false)
-    const [bag, setBag] = useState([])
     const [profile, setProfile] = useState({})
     const [demands, setDemands] = useState([])
     const [request, setRequest] = useState({})
     const [address, setAdress] = useState({})
-    const navigation = useNavigation()
-
-
+    
+    
 
     const getToken = async(tk)=>{
         try{
@@ -33,31 +32,16 @@ function AuthProvider(props){
             alert(e)
         }
     }
-    
-
-    const add = (ds)=>{
-        setDishId(ds.id)
-        setDish(ds)
-        setVisible(true)
-    }
-
-
-    const addToCart = (ds)=>{
-        const newBag = [...bag, ds]
-        setBag(newBag)
-        navigation.navigate('Carrinho')
-        setVisible(false)                
-    }
 
 
     const getProfile = async()=>{
         const headers = {
             headers: {
-                auth: await AsyncStorage.getItem('token')
+                authorization: await AsyncStorage.getItem('token')
             }
         }
         axios.get(`${url}/profile`, headers).then(res=>{
-            setProfile(res.data.user)
+            setProfile(res.data)
         }).catch(e=>{
             alert(e.response.data)
         })
@@ -106,12 +90,23 @@ function AuthProvider(props){
     }
 
 
+    const getAllOrders = async()=>{
+        const headers = {
+            headers: { authorization: await AsyncStorage.getItem('token') }
+        }
+        axios.get(`${url}/orders`, headers).then(res=>{
+            setBag(res.data)
+        }).catch(e => alert(e.response.data))
+    }
 
-    const states = { restaurant, product, visible, dish, bag, dishId, profile,
-        restaurantId, demands, request, address }
-    const setters = { getToken, setRestaurant, setProduct, setVisible, add, addToCart,
-        setBag, setRestaurantId }
-    const requests = { getProfile, historicRequests, activeRequest, registeredAddress }
+
+
+
+
+    const states = { restaurant, product, visible, dish, dishId, profile, bag,
+        restaurantId, demands, request, address, products }
+    const setters = { getToken, setRestaurant, setProduct, setVisible, setRestaurantId, setProducts }
+    const requests = { getProfile, historicRequests, activeRequest, registeredAddress, getAllOrders }
 
 
 

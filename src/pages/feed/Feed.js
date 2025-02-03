@@ -2,7 +2,7 @@ import { useContext, useEffect, useState, useCallback } from 'react'
 import { url } from '../../constants/urls'
 import axios from 'axios'
 import { AuthContext } from '../../global/Context'
-import { Searchbar, Avatar } from 'react-native-paper'
+import { Searchbar } from 'react-native-paper'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import {
     TouchableOpacity,
@@ -11,7 +11,8 @@ import {
     StyleSheet,
     View,
     BackHandler,
-    RefreshControl
+    RefreshControl,
+    Image
 } from 'react-native'
 
 
@@ -48,13 +49,14 @@ const Feed =(props)=>{
     const getRestaurants = async()=>{
         const headers = {
             headers: {
-                auth: await AsyncStorage.getItem('token')
+                authorization: await AsyncStorage.getItem('token')
             }
-        }        
+        }    
+          
         axios.get(`${url}/restaurants`, headers).then(res=>{
-            setRestaurants(res.data.restaurants)
+            setRestaurants(res.data)
         }).catch(e=>{
-            alert(e.response.data.message)
+            alert(e.response.data)
         })
     }
 
@@ -62,13 +64,18 @@ const Feed =(props)=>{
     const restaurantDetail = async(id)=>{
         const headers = {
             headers: {
-                auth: await AsyncStorage.getItem('token')
+                authorization: await AsyncStorage.getItem('token')
             }
         }
         axios.get(`${url}/restaurants/${id}`, headers).then(res=>{
-            setters.setRestaurant(res.data.restaurant)
-            setters.setRestaurantId(id)
-            props.navigation.navigate('Detail')
+            setters.setRestaurant(res.data)
+            const restaurantName = res.data.name
+            axios.get(`${url}/restaurant_products/${id}`, headers).then(res=>{
+                setters.setProducts(res.data)
+                props.navigation.navigate('Detail', { title: restaurantName })
+            }).catch(e=>{
+                alert(e.response.data)
+            })
         }).catch(e=>{
             alert(e.response.data)
         })
@@ -87,7 +94,7 @@ const Feed =(props)=>{
 
 
     return(
-        <View>
+        <View style={{marginBottom:65}}>
             <Searchbar style={styles.searchBarStyle} onChangeText={onChangeSearch} value={searchQuery}/>
             <ScrollView
                 refreshControl={
@@ -101,14 +108,10 @@ const Feed =(props)=>{
                             <View key={rest.id}
                                 style={styles.container}>
                                 <TouchableOpacity onPress={()=> restaurantDetail(rest.id)}>                            
-                                    <Avatar.Image size={250} style={styles.avatar}
-                                        source={{uri: rest.logoUrl}}/>
+                                    <Image  style={styles.avatar}
+                                        source={{uri: rest.logourl}}/>
                                 </TouchableOpacity>
                                 <Text style={styles.restName}>{rest.name}</Text>
-                                <Text style={styles.content}>
-                                    Entrega em: {rest.deliveryTime}min{'\n'}
-                                    Frete: R$ {rest.shipping.toFixed(2)}
-                                </Text>
                             </View>
                         )
                     })}
@@ -127,23 +130,27 @@ const styles = StyleSheet.create({
         alignItems: 'center'
     },
     container: {
+        width: '80%',
         display: 'flex',
         flexDirection: 'column',
         borderWidth: 1,
         borderColor: 'red',
         padding: 10,
-        margin: 10,
+        marginHorizontal: 10,
+        marginVertical: 20,
+        borderRadius: 10
     },
     avatar: {
-        margin: 10
+        backgroundColor: 'white',
+        width: '100%',
+        height: 150,
+        borderRadius: 10
     },
     restName: {
         fontSize: 20,
+        textAlign: 'center',
         color: 'red',
-        fontWeight: 'bold'
-    },
-    content: {
-        
+        margin: 10 
     }
 })
 

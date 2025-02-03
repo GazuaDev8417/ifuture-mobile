@@ -15,7 +15,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage"
 
 
 const Login = (props)=>{
-    const [email, setEmail] = useState('astrodev@future4.com')
+    const [email, setEmail] = useState('visitante@email.com')
     const [password, setPassword] = useState('123456')
     const { setters } = useContext(AuthContext)
 
@@ -42,11 +42,12 @@ const Login = (props)=>{
             email,
             password
         }
-        axios.post(`${url}/login`, body).then(res=>{            
-            setters.getToken(res.data.token)
+
+        axios.post(`${url}/login`, body).then(res=>{ 
+            setters.getToken(res.data)
             props.navigation.navigate('MyTabs')
         }).catch(e=>{
-            alert(e.response.data.message)
+            alert(e.response.data)
         })
         
     }

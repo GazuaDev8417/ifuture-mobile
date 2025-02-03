@@ -12,7 +12,7 @@ import Address from './src/pages/address/Address'
 import Cart from './src/pages/cart/Cart'
 import Profile from './src/pages/profile/Profile'
 import UpdateProfile from './src/pages/updateProfile/UpdateProfile'
-import Splash from './src/pages/Splash/Splash'
+//import Splash from './src/pages/Splash/Splash'
 import { StatusBar, View } from 'react-native'
 
 
@@ -71,15 +71,15 @@ export default function App() {
         backgroundColor='red'/>
       <AuthProvider>
         <Stack.Navigator
-          initialRouteName='Splash'
+          initialRouteName='Login'
           screenOptions={{
             headerTitleAlign: 'center'
           }}>
 
-          <Stack.Screen
+          {/* <Stack.Screen
             name='Splash'
             component={Splash}
-            options={{ headerShown: false }}/>
+            options={{ headerShown: false }}/> */}
           
           <Stack.Screen
             name='Login'
@@ -102,9 +102,8 @@ export default function App() {
           <Stack.Screen
             name='Detail'
             component={Detail}
-            options={{
-              headerShown: false
-            }}/>
+            options={{ headerShown: false }}
+            />
 
           <Stack.Screen
             name='Endereço'

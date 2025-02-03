@@ -1,38 +1,28 @@
 {
   "expo": {
-    "name": "ifuture",
-    "slug": "ifuture",
-    "version": "1.0.8",
+    "name": "ifuture_mobile",
+    "slug": "ifuture_mobile",
+    "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
+    "newArchEnabled": true,
     "splash": {
-      "image": "./assets/splash.png",
+      "image": "./assets/splash-icon.png",
       "resizeMode": "contain",
-      "backgroundColor": "#ff4040"
+      "backgroundColor": "#ffffff"
     },
-    "assetBundlePatterns": [
-      "**/*"
-    ],
     "ios": {
       "supportsTablet": true
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/icon.png",
+        "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      },
-      "versionCode": 9,
-      "permissions": [],
-      "package": "com.gazua300.ifuture"
+      }
     },
     "web": {
       "favicon": "./assets/favicon.png"
-    },
-    "extra": {
-      "eas": {
-        "projectId": "02ca740e-228f-400b-8a05-720f18bed061"
-      }
     }
   }
 }
