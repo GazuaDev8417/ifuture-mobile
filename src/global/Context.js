@@ -105,7 +105,7 @@ function AuthProvider(props){
 
     const states = { restaurant, product, visible, dish, dishId, profile, bag,
         restaurantId, demands, request, address, products }
-    const setters = { getToken, setRestaurant, setProduct, setVisible, setRestaurantId, setProducts }
+    const setters = { getToken, setRestaurant, setProduct, setVisible, setRestaurantId, setProducts, setBag }
     const requests = { getProfile, historicRequests, activeRequest, registeredAddress, getAllOrders }
 
 

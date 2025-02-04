@@ -2,11 +2,12 @@ import { useContext, useEffect, useState } from 'react'
 import axios from 'axios'
 import { url } from '../../constants/urls'
 import { AuthContext } from '../../global/Context'
-import { Avatar } from 'react-native-paper'
 import Edit from 'react-native-vector-icons/Entypo'
 import { Picker } from "@react-native-picker/picker"
 import AsyncStorage from '@react-native-async-storage/async-storage'
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Image, TextInput } from 'react-native'
+import { CreditCardInput } from 'react-native-credit-card-input'
+import QRCode from 'react-native-qrcode-svg'
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Image, TextInput, Alert } from 'react-native'
 
 
 
@@ -15,7 +16,6 @@ const Cart = (props)=>{
     const { states, setters, requests } = useContext(AuthContext)
     const bag = states.bag
     const profile = states.profile
-    const restaurant = states.restaurant
     const [value, setValue] = useState('money')
     const [total, setTotal] = useState(0)
 
@@ -24,20 +24,34 @@ const Cart = (props)=>{
     useEffect(()=>{
         requests.getProfile()
         requests.getAllOrders()
-        setTotal(bag.reduce((acc, item) => acc + item.total, 0))
+        //setTotal(bag.reduce((acc, item) => acc + item.total, 0))
     }, [])
+
+    useEffect(()=>{
+        setTotal(bag.reduce((acc, item) => acc + (item.price * item.quantity), 0))
+    }, [bag])
 
 
 
     const handleNumber = async(e, id)=>{
         const newQuantity = Number(e)
-        const updatedBag = bag.map(item => {
-            if(item.id === id){
-                return { ...item, quantity: newQuantity }
-            }
 
-            return item 
+        if (isNaN(newQuantity) || newQuantity < 1) {
+            newQuantity = 1;
+        }
+
+        setters.setBag(prevBag =>{
+            const updatedBag = prevBag.map(item => {
+                if(item.id === id){
+                    return { ...item, quantity: newQuantity }
+                }else{
+                    return item
+                }
+            })
+            
+            return updatedBag 
         })
+        
         const headers = {
             headers: { authorization: await AsyncStorage.getItem('token') }
         }
@@ -45,15 +59,65 @@ const Cart = (props)=>{
         axios.patch(`${url}/order/${id}`, {
             quantity: newQuantity
         }, headers).then(()=>{
-            getAllOrders()
-        }).catch(e => alert(e.response.data) )
-
-        setTotal(updatedBag.reduce((acc, item) => acc + item.total, 0))
+            requests.getAllOrders()
+        }).catch(e =>{
+            console.error(e.response.data)
+        } )
     }
 
 
-    const shopFinish = async()=>{
+    const removeFromCart = async(b)=>{
+        const headers = {
+            headers: { authorization: await AsyncStorage.getItem('token') }
+        }
+        axios.delete(`${url}/order/${b.id}`, headers).then(() =>{
+            requests.getAllOrders()
+        }).catch(e => alert(e.response.data))
     }
+
+
+    const cleanCart = ()=>{
+        Alert.alert(
+            'Tem certeza que deseja excluir todos os itens do carrinho?',
+            '',
+            [
+                {
+                    text:'Cancelar'
+                },
+                {
+                    text:'Ok',
+                    onPress: async() =>{
+                        const headers = {
+                            headers: { authorization: await AsyncStorage.getItem('token') }
+                        }
+                
+                        axios.delete(`${url}/requested_orders`, headers).then(()=>{
+                            requests.getAllOrders()
+                        }).catch(e => alert(e.response.data))
+                    }
+                }
+            ]
+        )        
+    }
+
+
+    const handleCardChange = (FormData)=>{
+
+    }
+
+
+    const endOrders = async()=>{
+        const headers = {
+            headers: { authorization: await AsyncStorage.getItem('token') }
+        }
+        
+        Alert.alert(
+            'Você está perstes a finalizar seus pedidos',
+            `Seu total é de R$ ${total.toFixed(2)}`
+        )
+    }
+
+
 
 
 
@@ -72,6 +136,13 @@ const Cart = (props)=>{
                 </TouchableOpacity>
             </View>
             <View style={{borderWidth:1, marginBottom:30, margin:10}}/>
+            {bag.length > 0 && (
+                <TouchableOpacity 
+                    style={[styles.button, {width:'35%', margin:'auto'}]}
+                    onPress={cleanCart}>
+                    <Text style={{color:'white'}}>Limpar carrinho</Text>
+                </TouchableOpacity>
+            )}
             {bag.length > 0 ? bag.map(b=>{
                 return(
                     <View key={b.id} style={styles.container}>
@@ -83,12 +154,17 @@ const Cart = (props)=>{
                             source={{uri: b.photoUrl}}/>
                         <View style={styles.section}>
                             <View style={styles.quantitySection}>
-                                <Text>Quantidade:</Text>
+                                <Text>Quantidade: {b.quantity}</Text>
                                 <TextInput
                                     style={styles.quantity}
                                     keyboardType='numeric'
-                                    value={b.quantity}
-                                    onChangeText={(e) => handleNumber(e, b.id)}
+                                    value={String(b.quantity)}
+                                    onChangeText={(e) =>{
+                                        const num = parseInt(e, 10)
+                                        if((!isNaN(num) && num >= 1) || e === ''){
+                                            handleNumber(e, b.id)
+                                        }
+                                    }}
                                     />
                             </View>
                             <Text style={{textAlign:'left'}}>
@@ -114,8 +190,24 @@ const Cart = (props)=>{
                 <Picker.Item label='Dinheiro' value={'money'}/>
                 <Picker.Item label='Cartão de crédito' value={'creditcard'}/>
             </Picker>
-            <TouchableOpacity style={styles.btnShop}
-                onPress={shopFinish}>
+
+            {value === 'creditcard' ? (
+                <CreditCardInput
+                    requiresName
+                    requiresCVC
+                    requiresPostalCode={false}
+                    onChange={handleCardChange}/>
+            ) : (
+                <View style={{marginHorizontal:'auto', marginVertical:10}}>
+                    <QRCode
+                        value='Bora embora'
+                        size={100} />
+                </View>
+            ) }
+
+            <TouchableOpacity style={[styles.btnShop, { backgroundColor: bag.length === 0 ? 'gray' : 'red' }] }
+                disabled={bag.length === 0 ? true : false}
+                onPress={endOrders}>
                 <Text style={{textAlign:'center', color:'whitesmoke'}}>Finalizar compra</Text>
             </TouchableOpacity>
         </ScrollView>
@@ -130,7 +222,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'space-between',
         marginTop: 50,
-        margin: 10,        
+        marginHorizontal: 15,        
     },
     restStyle: {
         color: 'red',
@@ -186,7 +278,8 @@ const styles = StyleSheet.create({
         backgroundColor: 'red',
         borderRadius: 10,
         padding: 5,
-        margin: 5
+        margin: 5,
+        marginBottom: 10
     }
 })
 

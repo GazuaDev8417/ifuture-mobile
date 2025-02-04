@@ -2,11 +2,10 @@ import { useContext, useEffect, useState } from "react"
 import { AuthContext } from "../../global/Context"
 import AsyncStorage from "@react-native-async-storage/async-storage"
 import { url } from "../../constants/urls"
-import { Avatar } from "react-native-paper"
 import axios from "axios"
 import * as Location from 'expo-location'
 import { Ionicons } from '@expo/vector-icons'
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image, Alert, FlatList } from 'react-native'
+import { View, Text, StyleSheet, TouchableOpacity, Image, Alert, FlatList } from 'react-native'
 
 
 
@@ -15,6 +14,7 @@ const Detail = (props)=>{
     const { states } = useContext(AuthContext)
     const restaurant = states.restaurant
     const pratos = states.products
+    const [loading, setLoading] = useState(false)
     const [places, setPlaces] = useState([])
     const API_KEY = 'AIzaSyDRDtZy_CrM0csM_Y51FU01-tiW4F2SapU'
     const [showlist, setShowlist] = useState(false)
@@ -25,19 +25,20 @@ const Detail = (props)=>{
         getPermission()
     }, [])
 
-
     const getPermission = async()=>{
         try{
+            setLoading(true)
             const { status } = await Location.requestForegroundPermissionsAsync()
             if(status !== 'granted'){
-                console.error('Permissão de localização negada')
-
+                console.error('Permissão de localização negada')        
+                setLoading(false)
                 return
             }
 
             getLocation()
         }catch(error){
             console.error(`Errio ao obter permissão: ${error}`)
+            setLoading(false)
         }
     }
 
@@ -46,13 +47,14 @@ const Detail = (props)=>{
             const location = await Location.getCurrentPositionAsync({})
             if(!location.coords){
                 console.error('Sem dados de localização')
-
+                setLoading(false)
                 return
             }
 
             fetchNearbyPlaces(location.coords.latitude, location.coords.longitude)
         }catch(error){
             console.error(`Erro ao buscar localização: ${error}`)
+            setLoading(false)
         }
     }
 
@@ -61,19 +63,22 @@ const Detail = (props)=>{
             const response = await axios.get(`https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${lat},${long}&radius=5000&type=restaurant&keyword=${encodeURIComponent(restaurant.name)}&key=${API_KEY}`)
             if(!response.data){
                 console.error('Sem dados de lugares próximos')
-
+                setLoading(false)
                 return
             }
             
             setPlaces(response.data.results)
-            console.log(Object.keys(response.data.results[0]))
-            console.log(response.data.results[0].opening_hours)
+            setLoading(false)
         }catch(error){
             console.error('Erro ao buscar lugares próximos: ', error)
+            setLoading(false)
         }
     }
 
 
+    const filteredPlaces = places && places.filter(place =>{
+        return place.name.toLowerCase().includes(restaurant.name.toLowerCase())
+    })
     
 
 
@@ -111,17 +116,18 @@ const Detail = (props)=>{
             )
         })
     }
+    
 
 
 
     return(
+        <>
+        <TouchableOpacity onPress={() => props.navigation.goBack()} style={{ marginTop: 10, marginLeft: 5 }}>
+            <Ionicons name="arrow-back" size={24} color="black" />
+        </TouchableOpacity>
         <FlatList
             ListHeaderComponent={
                 <>
-                    <TouchableOpacity onPress={() => props.navigation.goBack()} style={{ marginTop: 10, marginLeft: 5 }}>
-                        <Ionicons name="arrow-back" size={24} color="black" />
-                    </TouchableOpacity>
-
                     <Text style={styles.title}>{restaurant.category}</Text>
 
                     <View style={styles.imgContainer}>
@@ -139,14 +145,16 @@ const Detail = (props)=>{
                             style={[styles.button, { margin:'auto', width:'80%', backgroundColor:'blue' }]}
                             onPress={() => setShowlist(prev => !prev)}>
                             <Text style={{color:'white'}}>
-                                {!showlist ? 'Ver as lojas mais próximas' : 'Ocultar lojas'}
+                                {!showlist ? 'Ver lojas mais próximas' : 'Ocultar lojas'}
                             </Text>
                         </TouchableOpacity>
-                        {showlist && (
+                        {showlist && loading ? (
+                            <Text>Carrgando...</Text>
+                        ) : showlist && !loading ? (
                             <View style={{margin:10}}>
                                 <View style={{ borderWidth: 1, marginTop: 5 }}/>
                                 <FlatList
-                                    data={places}
+                                    data={filteredPlaces}
                                     keyExtractor={(place => place.place_id)}
                                     renderItem={({ item: place }) =>(
                                         <View style={{margin:5}}>
@@ -164,9 +172,10 @@ const Detail = (props)=>{
                                             </Text>
                                         </View>
                                 )}/>
+                                {filteredPlaces.length === 0 ? <Text>Não há {restaurant.name} nas proximidades</Text> : null}
                                 <View style={{ borderWidth: 1, marginTop: 5 }}/>
                             </View>
-                        )}
+                        ) : null }
                     </View>
 
                     <Text style={styles.menuTitle}>Cardápio principal</Text>
@@ -190,6 +199,7 @@ const Detail = (props)=>{
                     </TouchableOpacity>
                 </View>
         )}/>
+        </>
     )
 }
 
