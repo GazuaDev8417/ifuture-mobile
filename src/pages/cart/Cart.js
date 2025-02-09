@@ -2,7 +2,7 @@ import { useContext, useEffect, useState } from 'react'
 import axios from 'axios'
 import { url } from '../../constants/urls'
 import { AuthContext } from '../../global/Context'
-import Edit from 'react-native-vector-icons/Entypo'
+//import Edit from 'react-native-vector-icons/Entypo'
 import { Picker } from "@react-native-picker/picker"
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { CreditCardInput } from 'react-native-credit-card-input'
@@ -18,6 +18,8 @@ const Cart = (props)=>{
     const profile = states.profile
     const [value, setValue] = useState('money')
     const [total, setTotal] = useState(0)
+    const [cardData, setCardData] = useState(null)
+    const [increaseQrCodeSize, setIncreaseQrCodeSize] = useState(false)
 
 
 
@@ -102,10 +104,10 @@ const Cart = (props)=>{
 
 
     const handleCardChange = (FormData)=>{
-
+        setCardData(FormData)
     }
 
-
+console.log(cardData)
     const endOrders = async()=>{
         const headers = {
             headers: { authorization: await AsyncStorage.getItem('token') }
@@ -113,7 +115,20 @@ const Cart = (props)=>{
         
         Alert.alert(
             'Você está perstes a finalizar seus pedidos',
-            `Seu total é de R$ ${total.toFixed(2)}`
+            `Seu total é de R$ ${total.toFixed(2)}. Confere?`,
+            [
+                {
+                    text:'Cancelar'
+                },
+                {
+                    text:'Ok',
+                    onPress: () =>{
+                        axios.patch(`${url}/finished_orders`, {}, headers).then(() =>{
+                            requests.getAllOrders()
+                        }).catch(e => console.error(e.response.data))
+                    }
+                }
+            ]
         )
     }
 
@@ -131,9 +146,9 @@ const Cart = (props)=>{
                         {profile.city} - {profile.state}
                     </Text>
                 </View>
-                <TouchableOpacity onPress={()=> props.navigation.navigate('Endereço')}>
+                {/* <TouchableOpacity onPress={()=> props.navigation.navigate('Endereço')}>
                     <Edit name='edit' size={18}/>
-                </TouchableOpacity>
+                </TouchableOpacity> */}
             </View>
             <View style={{borderWidth:1, marginBottom:30, margin:10}}/>
             {bag.length > 0 && (
@@ -187,7 +202,7 @@ const Cart = (props)=>{
                 selectedValue={value}
                 onValueChange={(itemValue, itemIndex)=>
                 setValue(itemValue)}>                
-                <Picker.Item label='Dinheiro' value={'money'}/>
+                <Picker.Item label='Pix' value={'money'}/>
                 <Picker.Item label='Cartão de crédito' value={'creditcard'}/>
             </Picker>
 
@@ -197,19 +212,33 @@ const Cart = (props)=>{
                     requiresCVC
                     requiresPostalCode={false}
                     onChange={handleCardChange}/>
-            ) : (
-                <View style={{marginHorizontal:'auto', marginVertical:10}}>
+            ) : bag.length > 0 ? (
+                <TouchableOpacity 
+                    style={{alignItems:'center', gap:10, marginBottom:10}}
+                    onPress={() => setIncreaseQrCodeSize(prev => !prev)}
+                    >
+                    {!increaseQrCodeSize && (
+                        <Text style={{fontSize:10}}>Toque para aumentar tamanho</Text>
+                    )}
                     <QRCode
-                        value='Bora embora'
-                        size={100} />
-                </View>
-            ) }
+                        value={String(total)}
+                        size={!increaseQrCodeSize ? 50 : 250} />
+                </TouchableOpacity>
+            ) : null}
 
-            <TouchableOpacity style={[styles.btnShop, { backgroundColor: bag.length === 0 ? 'gray' : 'red' }] }
-                disabled={bag.length === 0 ? true : false}
-                onPress={endOrders}>
-                <Text style={{textAlign:'center', color:'whitesmoke'}}>Finalizar compra</Text>
-            </TouchableOpacity>
+            {value === 'money' ? (
+                <TouchableOpacity style={[styles.btnShop, { backgroundColor: bag.length === 0 ? 'gray' : 'red' }] }
+                    disabled={bag.length === 0 ? true : false}
+                    onPress={endOrders}>
+                    <Text style={{textAlign:'center', color:'whitesmoke'}}>Finalizar compra</Text>
+                </TouchableOpacity>
+            ) : (
+                <TouchableOpacity style={[styles.btnShop, { backgroundColor: bag.length === 0 || !cardData?.valid ? 'gray' : 'red' }] }
+                    disabled={bag.length === 0 || !cardData?.valid ? true : false}
+                    onPress={endOrders}>
+                    <Text style={{textAlign:'center', color:'whitesmoke'}}>Finalizar compra</Text>
+                </TouchableOpacity>
+            )}
         </ScrollView>
     )
 }
