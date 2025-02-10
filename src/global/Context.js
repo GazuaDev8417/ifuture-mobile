@@ -51,13 +51,14 @@ function AuthProvider(props){
     const historicRequests = async()=>{
         const headers = {
             headers: {
-                auth: await AsyncStorage.getItem('token')
+                authorization: await AsyncStorage.getItem('token')
             }
         }
-        axios.get(`${url}/orders/history`, headers).then(res=>{
-            setDemands(res.data.orders)
+        axios.get(`${url}/active_orders`, headers).then(res=>{
+            setDemands(res.data)
+            console.log(res.data)
         }).catch(e=>{
-            alert(e.response.data.message)
+            alert(e.response.data)
         })
     }
 

@@ -35,7 +35,7 @@ function MyTabs(){
         component={Feed}
         options={{
           tabBarIcon: ()=>(
-            <Icon name='home' size={30}/>
+            <Icon name='home' size={25}/>
           )
         }}/>
 
@@ -44,7 +44,7 @@ function MyTabs(){
         component={Cart}
         options={{
           tabBarIcon: ()=>(
-            <Icon name='shopping-cart' size={30}/>
+            <Icon name='shopping-cart' size={25}/>
           )
         }}
         />
@@ -54,7 +54,7 @@ function MyTabs(){
         component={Profile}
         options={{
           tabBarIcon: ()=>(
-            <Person name='person' size={30}/>
+            <Person name='person' size={25}/>
           )
         }}
         />

@@ -3,7 +3,7 @@ import { AuthContext } from '../../global/Context'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import Icon from "react-native-vector-icons/AntDesign"
 import Edit from 'react-native-vector-icons/Entypo'
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from "react-native"
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Image } from "react-native"
 
 
 
@@ -33,9 +33,8 @@ const Profile = (props)=>{
             </TouchableOpacity>
             <View style={styles.sectionOne}>
                 <Text style={styles.txtContainer}>
-                    {profile.name}{'\n\n'}
-                    {profile.email}{'\n\n'}
-                    {profile.cpf}
+                    {profile.username}{'\n'}
+                    {profile.email}{'\n'}
                 </Text>
                 <TouchableOpacity onPress={()=> props.navigation.navigate('Atualizar')}>
                     <Edit name='edit' size={18}/>
@@ -44,8 +43,7 @@ const Profile = (props)=>{
             <View style={{borderWidth:0.5, margin:5}}/>
             <View style={styles.sectionOne}>
                 <Text style={styles.txtContainer}>
-                    Enderço cadastrado{'\n\n'}
-                    {profile.address}
+                    {profile.street} {profile.number}, {profile.neighbourhood}{'\n'}{profile.city} - {profile.state}
                 </Text>
                 <TouchableOpacity onPress={()=> props.navigation.navigate('Endereço')}>
                     <Edit name='edit' size={18}/>
@@ -55,15 +53,20 @@ const Profile = (props)=>{
             <View style={{borderWidth:0.5, margin:5}}/>
             {demands.length > 0 ? demands.map(demand=>{
                 return(
-                    <View key={demand.createdAt}
+                    <View key={demand.id}
                         style={styles.card}>
                         <Text style={styles.cardTitle}>
-                            {demand.restaurantName}
+                            {demand.product} R$ {demand.price}
                         </Text>
-                        <Text>
-                            Pedido feito em: {new Date(demand.createdAt).toLocaleDateString()} as {new Date(demand.createdAt).toLocaleTimeString()}{'\n'}
-                            Expira em: {new Date(demand.expiresAt).toLocaleDateString()} as {new Date(demand.expiresAt).toLocaleTimeString()}
-                        </Text>
+                        <Image
+                            style={styles.img}
+                            source={{ uri: demand.photoUrl }}/>
+                        <View style={{flexDirection:'column', justifyContent:'space-between', margin:5}}>
+                            <Text>
+                                Quantidade: {demand.quantity}{'\n'}
+                                Total: R$ {demand.total.toFixed(2)}{'\n'}
+                            </Text>
+                        </View>
                     </View>
                 )
             }) : null}
@@ -101,9 +104,17 @@ const styles = StyleSheet.create({
         padding: 5
     },
     cardTitle: {
+        textAlign: 'center',
         fontSize: 20,
         color: 'red',
         marginBottom: 10
+    },
+    img: {
+        backgroundColor: 'white',
+        width: '50%',
+        height: 100,
+        borderRadius: 10,
+        margin: 'auto'
     }
 })
 

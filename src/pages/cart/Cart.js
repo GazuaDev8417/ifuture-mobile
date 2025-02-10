@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState } from 'react'
+import { useContext, useEffect, useState, useRef } from 'react'
 import axios from 'axios'
 import { url } from '../../constants/urls'
 import { AuthContext } from '../../global/Context'
@@ -7,12 +7,14 @@ import { Picker } from "@react-native-picker/picker"
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { CreditCardInput } from 'react-native-credit-card-input'
 import QRCode from 'react-native-qrcode-svg'
+import * as Clipboard from 'expo-clipboard'
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Image, TextInput, Alert } from 'react-native'
 
 
 
 
 const Cart = (props)=>{
+    const cardRef = useRef(null)
     const { states, setters, requests } = useContext(AuthContext)
     const bag = states.bag
     const profile = states.profile
@@ -20,13 +22,13 @@ const Cart = (props)=>{
     const [total, setTotal] = useState(0)
     const [cardData, setCardData] = useState(null)
     const [increaseQrCodeSize, setIncreaseQrCodeSize] = useState(false)
+    
 
 
 
     useEffect(()=>{
         requests.getProfile()
         requests.getAllOrders()
-        //setTotal(bag.reduce((acc, item) => acc + item.total, 0))
     }, [])
 
     useEffect(()=>{
@@ -68,6 +70,16 @@ const Cart = (props)=>{
     }
 
 
+    const handleCopy = async(content)=>{
+        await Clipboard.setStringAsync(content)
+    }
+
+
+    const handleCardChange = (FormData)=>{
+        setCardData(FormData)
+    }
+
+
     const removeFromCart = async(b)=>{
         const headers = {
             headers: { authorization: await AsyncStorage.getItem('token') }
@@ -103,11 +115,10 @@ const Cart = (props)=>{
     }
 
 
-    const handleCardChange = (FormData)=>{
-        setCardData(FormData)
+    const clearCardInputs = ()=>{
     }
 
-console.log(cardData)
+
     const endOrders = async()=>{
         const headers = {
             headers: { authorization: await AsyncStorage.getItem('token') }
@@ -208,22 +219,30 @@ console.log(cardData)
 
             {value === 'creditcard' ? (
                 <CreditCardInput
+                    ref={cardRef}
                     requiresName
                     requiresCVC
                     requiresPostalCode={false}
                     onChange={handleCardChange}/>
             ) : bag.length > 0 ? (
-                <TouchableOpacity 
-                    style={{alignItems:'center', gap:10, marginBottom:10}}
-                    onPress={() => setIncreaseQrCodeSize(prev => !prev)}
-                    >
-                    {!increaseQrCodeSize && (
-                        <Text style={{fontSize:10}}>Toque para aumentar tamanho</Text>
-                    )}
-                    <QRCode
-                        value={String(total)}
-                        size={!increaseQrCodeSize ? 50 : 250} />
-                </TouchableOpacity>
+                <>
+                    <TouchableOpacity 
+                        style={{alignItems:'center', gap:10, marginBottom:10}}
+                        onPress={() => setIncreaseQrCodeSize(prev => !prev)}
+                        >
+                        {!increaseQrCodeSize && (
+                            <Text style={{fontSize:10}}>Toque para aumentar o tamanho</Text>
+                        )}
+                        <QRCode
+                            value={String(total)}
+                            size={!increaseQrCodeSize ? 50 : 250} />
+                    </TouchableOpacity>
+                    <TouchableOpacity 
+                        style={{alignItems:'center', margin:10}}
+                        onPress={() => handleCopy(String(total))}>
+                        <Text>Copiar</Text>
+                    </TouchableOpacity>
+                </>                
             ) : null}
 
             {value === 'money' ? (
@@ -239,6 +258,7 @@ console.log(cardData)
                     <Text style={{textAlign:'center', color:'whitesmoke'}}>Finalizar compra</Text>
                 </TouchableOpacity>
             )}
+            <Text onPress={clearCardInputs} >Aqui</Text>
         </ScrollView>
     )
 }
@@ -294,7 +314,7 @@ const styles = StyleSheet.create({
     },
     img: {
         backgroundColor: 'white',
-        width: '100%',
+        width: '50%',
         height: 100,
         borderRadius: 10,
         marginVertical: 10
