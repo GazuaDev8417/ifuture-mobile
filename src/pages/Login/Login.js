@@ -3,6 +3,7 @@ import { StyleSheet } from "react-native"
 import { url } from "../../constants/urls"
 import axios from 'axios'
 import { AuthContext } from "../../global/Context"
+import { Feather } from '@expo/vector-icons'
 import { Text,
     TextInput,
     View,
@@ -17,6 +18,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage"
 const Login = (props)=>{
     const [email, setEmail] = useState('visitante@email.com')
     const [password, setPassword] = useState('123456')
+    const [showPassword, setShowPassword] = useState(false)
     const { setters } = useContext(AuthContext)
 
 
@@ -67,11 +69,16 @@ const Login = (props)=>{
                         onChangeText={setEmail}
                         placeholder="nome@email.com"/>
                     
-                    <TextInput style={styles.input}
+                    <View style={styles.passwordContainer}>
+                        <TextInput style={styles.input}
                         value={password}
                         onChangeText={setPassword}
-                        secureTextEntry={true}
-                        placeholder="Senha"/>
+                        secureTextEntry={showPassword ? false : true}
+                        placeholder='Senha'/>
+                        <TouchableOpacity onPress={() => setShowPassword(prev => !prev)}>
+                            <Feather name={showPassword ? 'eye' : 'eye-off'} size={20} style={styles.icon}/>
+                        </TouchableOpacity>
+                    </View>
 
                     <View style={styles.btnContainer}>
                         <TouchableOpacity onPress={limpar}
@@ -111,6 +118,14 @@ const styles = StyleSheet.create({
         fontSize: 18,
         borderRadius: 10,
         paddingHorizontal: 10
+    },
+    passwordContainer: {
+        position: 'relative'
+    },
+    icon: {
+        position: 'absolute',
+        right: 25,
+        bottom: 20
     },
     btnContainer: {
         margin: 10,

@@ -3,15 +3,16 @@ import axios from 'axios'
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView } from "react-native"
 import { url } from "../../constants/urls"
 import { AuthContext } from "../../global/Context"
+import { Feather } from '@expo/vector-icons'
 
 
 
 const Signup = (props)=>{
     const [nome, setNome] = useState('')
     const [email, setEmail] = useState('')
-    const [cpf, setCpf] = useState('')
+    const [phone, setPhone] = useState('')
     const [senha, setSenha] = useState('')
-    const [confSenha, setConfSenha] = useState('')
+    const [showPassword, setShowPassword] = useState(false)
     const { setters } = useContext(AuthContext)
 
 
@@ -20,26 +21,21 @@ const Signup = (props)=>{
         const body = {
             name:nome,
             email,
-            cpf,
+            phone,
             password: senha,
         }
 
-        if(senha !== confSenha){
-            alert('As senhas não conferem!')
-        }else{
-            axios.post(`${url}/signup`, body).then(res=>{
-                setters.getToken(res.data.token)
-                props.navigation.navigate('Endereço')
-            }).catch(e=>{
-                alert(e.response.data.message)
-            })
-        }
+        axios.post(`${url}/signup`, body).then(res=>{
+            setters.getToken(res.data.token)
+            props.navigation.navigate('Endereço')
+        }).catch(e=>{
+            alert(e.response.data)
+        })
     }
 
 
     const limpar = ()=>{
-        setConfSenha('')
-        setCpf('')
+        setPhone('')
         setEmail('')
         setNome('')
         setSenha('')
@@ -61,23 +57,22 @@ const Signup = (props)=>{
                         placeholder='nome@gmail.com'/>
                     
                     <TextInput style={styles.input}
-                        value={cpf}
-                        onChangeText={setCpf}
+                        value={phone}
+                        onChangeText={setPhone}
                         maxLength={11}
                         keyboardType='numeric'
-                        placeholder='CPF'/>
+                        placeholder='Telefone'/>
                     
-                    <TextInput style={styles.input}
+                   <View style={styles.passwordContainer}>
+                     <TextInput style={styles.input}
                         value={senha}
                         onChangeText={setSenha}
-                        secureTextEntry={true}
+                        secureTextEntry={showPassword ? false : true}
                         placeholder='Senha'/>
-
-                    <TextInput style={styles.input}
-                        value={confSenha}
-                        onChangeText={setConfSenha}
-                        secureTextEntry={true}
-                        placeholder='Confirme sua senha'/>
+                        <TouchableOpacity onPress={() => setShowPassword(prev => !prev)}>
+                            <Feather name={showPassword ? 'eye' : 'eye-off'} size={20} style={styles.icon}/>
+                        </TouchableOpacity>
+                   </View>
 
                     <View style={styles.btnContainer}>
                         <TouchableOpacity onPress={limpar}
@@ -112,6 +107,14 @@ const styles = StyleSheet.create({
         fontSize: 18,
         borderRadius: 10,
         paddingHorizontal: 10
+    },
+    passwordContainer: {
+        position: 'relative'
+    },
+    icon: {
+        position: 'absolute',
+        right: 25,
+        bottom: 20
     },
     btnContainer: {
         display: 'flex',

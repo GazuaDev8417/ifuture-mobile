@@ -32,25 +32,48 @@ const Profile = (props)=>{
               <Icon name='logout' size={25}/>
             </TouchableOpacity>
             <View style={styles.sectionOne}>
-                <Text style={styles.txtContainer}>
-                    {profile.username}{'\n'}
-                    {profile.email}{'\n'}
-                </Text>
-                <TouchableOpacity onPress={()=> props.navigation.navigate('Atualizar')}>
-                    <Edit name='edit' size={18}/>
-                </TouchableOpacity>
+                <View style={styles.titleWrapper}>
+                    <Text style={styles.title}>Perfil do Usuário</Text>
+                </View>
+                <View style={styles.txtContainer}>                    
+                    <View style={{maxWidth:'90%'}}>
+                        <Text style={styles.values}>{profile.username}{'\n'}</Text>
+                        <Text style={styles.values}>{profile.email}{'\n'}</Text>
+                        <Text style={styles.values}>{profile.phone}</Text>
+                    </View>
+                    <TouchableOpacity onPress={()=> props.navigation.navigate('Atualizar')}>
+                        <Edit name='edit' size={18}/>
+                    </TouchableOpacity>
+                </View>
             </View>
             <View style={{borderWidth:0.5, margin:5}}/>
-            <View style={styles.sectionOne}>
-                <Text style={styles.txtContainer}>
-                    {profile.street} {profile.number}, {profile.neighbourhood}{'\n'}{profile.city} - {profile.state}
-                </Text>
-                <TouchableOpacity onPress={()=> props.navigation.navigate('Endereço')}>
-                    <Edit name='edit' size={18}/>
-                </TouchableOpacity>
+            <View style={styles.sectionTwo}>
+                <View style={styles.titleWrapper}>
+                    <Text style={styles.title}>Endereço Cadastrado</Text>
+                </View>
+                <View style={styles.txtContainer}>
+                    <View style={{maxWidth:'90%'}}>
+                        <Text style={styles.properties}>
+                            Local:<Text style={styles.values}> {profile.street}, {profile.number ? profile.number : 'S/N'}</Text>
+                        </Text>
+                        <Text style={styles.properties}>
+                            Bairro:<Text style={styles.values}> {profile.neighbourhood}</Text>
+                        </Text>
+                        <Text style={styles.properties}>
+                            Cidade/Estado:<Text style={styles.values}> {profile.city} - {profile.state}</Text>
+                        </Text>
+                        <Text style={styles.properties}>
+                            CEP:<Text style={styles.values}> {profile.cep}</Text>
+                        </Text>
+                    </View>
+                    <TouchableOpacity onPress={()=> props.navigation.navigate('Endereço')}>
+                        <Edit name='edit' size={18}/>
+                    </TouchableOpacity>
+                </View>
             </View>
+            <View style={{borderWidth:0.5, margin:5}}/>
             <Text style={styles.historicTitle}>Historico de pedidos</Text>
-            <View style={{borderWidth:0.5, margin:5}}/>
+            <View style={{borderWidth:0.3, margin:5}}/>
             {demands.length > 0 ? demands.map(demand=>{
                 return(
                     <View key={demand.id}
@@ -82,15 +105,33 @@ const styles = StyleSheet.create({
         right: 5
     },
     sectionOne: {
-        margin: 15,
-        marginTop: '20%',
+        marginTop: 50,
+        marginHorizontal: 10        
+    },
+    sectionTwo: {
+        marginTop: 20,
+        marginHorizontal: 10        
+    },
+    titleWrapper: {
+        width:'100%',
+        alignItems: 'center',
+        marginBottom: 20
+    },
+    properties: {
+        fontWeight: 'bold'
+    },
+    values: {
+        fontWeight: 'normal'
+    },
+    title: {
+        fontSize: 20,
+        fontWeight: 400
+    },
+    txtContainer: {
         display: 'flex',
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between'
-    },
-    txtContainer: {
-        fontSize: 17
     },
     historicTitle: {
         textAlign:'center',

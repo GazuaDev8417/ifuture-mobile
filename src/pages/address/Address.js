@@ -1,13 +1,12 @@
-import { useContext, useState } from 'react'
+import { useState } from 'react'
 import axios from 'axios'
 import { url } from '../../constants/urls'
-import { AuthContext } from '../../global/Context'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { View, TextInput, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-native'
 
 const Address = (props)=>{
-    const { states, setters } = useContext(AuthContext)
     const [street, setStreet] = useState('')
+    const [cep, setCep] = useState('')
     const [number, setNumber] = useState('')
     const [neighbourhood, setNeighbourhood] = useState('')
     const [city, setCity] = useState('')
@@ -15,6 +14,18 @@ const Address = (props)=>{
     const [complement, setComplement] = useState('')
 
 
+
+
+
+    const findAdressByCep = ()=>{
+        axios.get(`https://viacep.com.br/ws/${cep}/json/`).then(res=>{
+            setStreet(res.data.logradouro)
+            setCep(res.data.cep)
+            setNeighbourhood(res.data.bairro)
+            setCity(res.data.localidade)
+            setState(res.data.estado)
+        }).catch(e => alert(e.response.data))
+    }
 
     const saveAddress = async()=>{
         const body = {
@@ -47,6 +58,7 @@ const Address = (props)=>{
         setNumber('')
         setState('')
         setStreet('')
+        setCep('')
     }
     
 
@@ -64,6 +76,13 @@ const Address = (props)=>{
                         value={number}
                         placeholder='Número'
                         keyboardType='numeric'/>
+                    
+                    <TextInput style={styles.input}
+                        onChangeText={setCep}
+                        value={cep}
+                        placeholder='CEP'
+                        keyboardType='numeric'
+                        onBlur={findAdressByCep}/>
 
                     <TextInput style={styles.input}
                         onChangeText={setNeighbourhood}

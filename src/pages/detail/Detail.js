@@ -4,6 +4,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage"
 import { url } from "../../constants/urls"
 import axios from "axios"
 import * as Location from 'expo-location'
+import { API_KEY } from '@env'
 import { Ionicons } from '@expo/vector-icons'
 import { View, Text, StyleSheet, TouchableOpacity, Image, Alert, FlatList } from 'react-native'
 
@@ -16,7 +17,6 @@ const Detail = (props)=>{
     const pratos = states.products
     const [loading, setLoading] = useState(false)
     const [places, setPlaces] = useState([])
-    const API_KEY = 'AIzaSyDRDtZy_CrM0csM_Y51FU01-tiW4F2SapU'
     const [showlist, setShowlist] = useState(false)
 
 
@@ -184,21 +184,23 @@ const Detail = (props)=>{
             }
             data={pratos}
             keyExtractor={(prato => prato.id)}
-            renderItem={({ item: prato }) => (
-                <View style={styles.card}>
-                    <Image                            
-                        style={styles.img} 
-                        source={{uri: prato.photoUrl}}/>
-                    <View style={styles.legendCard}>
-                        <Text style={{color:'red', marginLeft:5}}>{prato.name}</Text>
-                        <Text style={{marginLeft:5}}>R$ {prato.price.toFixed(2)}</Text>
+            renderItem={({ item: prato }) => {
+                return(
+                    <View style={styles.card}>
+                        <Image                            
+                            style={styles.img} 
+                            source={{uri: prato.photoUrl}}/>
+                        <View style={styles.legendCard}>
+                            <Text style={{color:'red', marginLeft:5}}>{prato.name}</Text>
+                            <Text style={{marginLeft:5}}>R$ {Number(prato.price).toFixed(2)}</Text>
+                        </View>
+                        <TouchableOpacity style={styles.button}
+                            onPress={()=> request(prato)}>
+                            <Text style={{color:'white'}}>Pedir</Text>
+                        </TouchableOpacity>
                     </View>
-                    <TouchableOpacity style={styles.button}
-                        onPress={()=> request(prato)}>
-                        <Text style={{color:'white'}}>Pedir</Text>
-                    </TouchableOpacity>
-                </View>
-        )}/>
+                )
+            }}/>
         </>
     )
 }
